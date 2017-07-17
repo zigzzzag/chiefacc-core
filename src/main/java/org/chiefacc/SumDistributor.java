@@ -1,55 +1,56 @@
 package org.chiefacc;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.NavigableSet;
+import java.util.PriorityQueue;
 import java.util.TreeSet;
 
-public class SumDistributor {
+class SumDistributor {
 
-    private NavigableSet<PersonPair> distrRes = new TreeSet<>();
-    private double averageSum = -1;
-
-    public SumDistributor() {
+    SumDistributor() {
     }
 
+    NavigableSet<PersonPair> distribute(PriorityQueue<Person> persons) {
+        return distribute(persons, new TreeSet<>(), averageFromPersons(persons));
+    }
 
-    //todo remake
-    public NavigableSet<PersonPair> distribute(NavigableSet<Person> persons) {
+    private NavigableSet<PersonPair> distribute(PriorityQueue<Person> persons, NavigableSet<PersonPair> distrRes,
+                                                final double averageSum) {
 
-        if (persons == null || persons.isEmpty() || persons.first().getSum() == averageSum) {
-            distrRes = new TreeSet<>();
-            averageSum = -1;
+        if (persons == null || persons.isEmpty() || persons.peek().getSum() == averageSum) {
             return Collections.emptyNavigableSet();
         }
 
-        if (averageSum == -1) {
-            averageSum = averageFromPersons(persons);
-        }
-
-        double sumToDistr = persons.first().getSum() - averageSum;
-        persons.first().setSum(averageSum);
+        double sumToDistr = persons.peek().getSum() - averageSum;
 
         // распределяем разницу первого по всем начиная с последнего
-        final NavigableSet<Person> personsWithoutFirst = persons.subSet(persons.first(), false, persons.last(), true);
-        for (Person p : personsWithoutFirst.descendingSet()) {
+        final Person firstPerson = persons.poll();
+
+        final List<Person> personsList = new ArrayList<>(persons);
+        for (int i = persons.size() - 1; i >= 0; i--) {
+            Person p = personsList.get(i);
             if (sumToDistr <= averageSum - p.getSum()) {
                 p.setSum(p.getSum() + sumToDistr);
-                distrRes.add(new PersonPair(p, persons.first(), sumToDistr));
+                distrRes.add(new PersonPair(p, firstPerson, sumToDistr));
                 break;
             } else {
                 double diff = averageSum - p.getSum();
-                p.setSum(p.getSum() + diff);
-                distrRes.add(new PersonPair(p, persons.first(), diff));
-                sumToDistr -= diff;
+                if (diff != 0) {
+                    p.setSum(p.getSum() + diff);
+                    distrRes.add(new PersonPair(p, firstPerson, diff));
+                    sumToDistr -= diff;
+                }
             }
         }
 
-        distrRes.addAll(distribute(personsWithoutFirst));
+        distrRes.addAll(distribute(persons));
 
         return distrRes;
     }
 
-    private double averageFromPersons(NavigableSet<Person> persons) {
+    private double averageFromPersons(PriorityQueue<Person> persons) {
         double allSum = 0;
         for (Person p : persons) {
             allSum += p.getSum();

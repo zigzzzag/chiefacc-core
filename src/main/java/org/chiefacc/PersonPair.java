@@ -6,7 +6,7 @@ public class PersonPair implements Comparable<PersonPair> {
     private final Person payTo;
     private final double sum;
 
-    public PersonPair(Person payFrom, Person payTo, double sum) {
+    PersonPair(Person payFrom, Person payTo, double sum) {
         this.payFrom = payFrom;
         this.payTo = payTo;
         this.sum = sum;
@@ -20,7 +20,7 @@ public class PersonPair implements Comparable<PersonPair> {
         return payTo;
     }
 
-    public double getSum() {
+    private double getSum() {
         return sum;
     }
 
@@ -35,6 +35,6 @@ public class PersonPair implements Comparable<PersonPair> {
 
     @Override
     public String toString() {
-        return "Pay from " + payFrom.getName() + " to " + payTo.getName() + " sum " + sum;
+        return payFrom.getName() + " -> " + payTo.getName() + " : " + sum;
     }
 }
