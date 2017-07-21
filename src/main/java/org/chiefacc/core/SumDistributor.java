@@ -1,26 +1,24 @@
-package org.chiefacc;
+package org.chiefacc.core;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.NavigableSet;
 import java.util.PriorityQueue;
 import java.util.TreeSet;
 
-class SumDistributor {
+public class SumDistributor {
 
-    SumDistributor() {
+    public SumDistributor() {
     }
 
-    NavigableSet<PersonPair> distribute(PriorityQueue<Person> persons) {
-        return distribute(persons, new TreeSet<>(), averageFromPersons(persons));
+    public NavigableSet<PersonPair> distribute(PriorityQueue<Person> persons) {
+        return distribute(persons, new TreeSet<PersonPair>(), averageFromPersons(persons));
     }
 
+    //todo remake PriorityQueue on List
     private NavigableSet<PersonPair> distribute(PriorityQueue<Person> persons, NavigableSet<PersonPair> distrRes,
                                                 final double averageSum) {
 
         if (persons == null || persons.isEmpty() || persons.peek().getSum() == averageSum) {
-            return Collections.emptyNavigableSet();
+            return new TreeSet<>();
         }
 
         double sumToDistr = persons.peek().getSum() - averageSum;
@@ -28,9 +26,11 @@ class SumDistributor {
         // распределяем разницу первого по всем начиная с последнего
         final Person firstPerson = persons.poll();
 
-        final List<Person> personsList = new ArrayList<>(persons);
-        for (int i = persons.size() - 1; i >= 0; i--) {
-            Person p = personsList.get(i);
+
+        final PriorityQueue<Person> personsReverse = new PriorityQueue<>(persons.size(), Person.minToMaxComparator());
+        personsReverse.addAll(persons);
+        while (!personsReverse.isEmpty()) {
+            Person p = personsReverse.poll();
             if (sumToDistr <= averageSum - p.getSum()) {
                 p.setSum(p.getSum() + sumToDistr);
                 distrRes.add(new PersonPair(p, firstPerson, sumToDistr));

@@ -1,4 +1,4 @@
-package org.chiefacc;
+package org.chiefacc.core;
 
 public class PersonPair implements Comparable<PersonPair> {
 
@@ -26,7 +26,7 @@ public class PersonPair implements Comparable<PersonPair> {
 
     @Override
     public int compareTo(PersonPair pp) {
-        if (this.sum > pp.getSum()) {
+        if (this.sum < pp.getSum()) {
             return 1;
         } else {
             return -1;
