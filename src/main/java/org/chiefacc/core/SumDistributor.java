@@ -1,7 +1,9 @@
 package org.chiefacc.core;
 
+import java.util.Collection;
 import java.util.NavigableSet;
 import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.TreeSet;
 
 public class SumDistributor {
@@ -9,28 +11,30 @@ public class SumDistributor {
     public SumDistributor() {
     }
 
-    public NavigableSet<PersonPair> distribute(PriorityQueue<Person> persons) {
-        return distribute(persons, new TreeSet<PersonPair>(), averageFromPersons(persons));
+    public Collection<PersonPair> distribute(Set<Person> persons) {
+        final PriorityQueue<Person> personsMaxToMin = new PriorityQueue<>(persons.size(), Person.maxToMinComparator());
+        personsMaxToMin.addAll(persons);
+
+        return distribute(personsMaxToMin, new TreeSet<PersonPair>(), averageFromPersons(persons));
     }
 
-    //todo remake PriorityQueue on List
-    private NavigableSet<PersonPair> distribute(PriorityQueue<Person> persons, NavigableSet<PersonPair> distrRes,
+    private NavigableSet<PersonPair> distribute(PriorityQueue<Person> personsMaxToMin, NavigableSet<PersonPair> distrRes,
                                                 final double averageSum) {
 
-        if (persons == null || persons.isEmpty() || persons.peek().getSum() == averageSum) {
+        if (personsMaxToMin == null || personsMaxToMin.isEmpty() || personsMaxToMin.peek().getSum() == averageSum) {
             return new TreeSet<>();
         }
 
-        double sumToDistr = persons.peek().getSum() - averageSum;
+        double sumToDistr = personsMaxToMin.peek().getSum() - averageSum;
 
         // распределяем разницу первого по всем начиная с последнего
-        final Person firstPerson = persons.poll();
+        final Person firstPerson = personsMaxToMin.poll();
 
 
-        final PriorityQueue<Person> personsReverse = new PriorityQueue<>(persons.size(), Person.minToMaxComparator());
-        personsReverse.addAll(persons);
-        while (!personsReverse.isEmpty()) {
-            Person p = personsReverse.poll();
+        final PriorityQueue<Person> personsMinToMax = new PriorityQueue<>(personsMaxToMin.size(), Person.minToMaxComparator());
+        personsMinToMax.addAll(personsMaxToMin);
+        while (!personsMinToMax.isEmpty()) {
+            Person p = personsMinToMax.poll();
             if (sumToDistr <= averageSum - p.getSum()) {
                 p.setSum(p.getSum() + sumToDistr);
                 distrRes.add(new PersonPair(p, firstPerson, sumToDistr));
@@ -45,12 +49,12 @@ public class SumDistributor {
             }
         }
 
-        distrRes.addAll(distribute(persons));
+        distribute(personsMaxToMin, distrRes, averageSum);
 
         return distrRes;
     }
 
-    private double averageFromPersons(PriorityQueue<Person> persons) {
+    private double averageFromPersons(Collection<Person> persons) {
         double allSum = 0;
         for (Person p : persons) {
             allSum += p.getSum();

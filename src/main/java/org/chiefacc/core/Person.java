@@ -24,8 +24,7 @@ public class Person {
         this.sum = sum;
     }
 
-    //todo encapsulate
-    public static Comparator<Person> minToMaxComparator() {
+    static Comparator<Person> minToMaxComparator() {
         return new Comparator<Person>() {
             @Override
             public int compare(Person p1, Person p2) {
@@ -38,8 +37,7 @@ public class Person {
         };
     }
 
-    //todo encapsulate
-    public static Comparator<Person> maxToMinComparator() {
+    static Comparator<Person> maxToMinComparator() {
         return new Comparator<Person>() {
             @Override
             public int compare(Person p1, Person p2) {
@@ -50,5 +48,20 @@ public class Person {
                 }
             }
         };
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Person)) return false;
+
+        Person person = (Person) o;
+
+        return name != null ? name.equals(person.name) : person.name == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
     }
 }
