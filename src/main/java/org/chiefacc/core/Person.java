@@ -1,26 +1,32 @@
 package org.chiefacc.core;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 
 public class Person {
 
     private final String name;
-    private double sum;
+    private BigDecimal sum;
 
-    public Person(String name, double sum) {
+
+    public Person(String name, BigDecimal sum) {
         this.name = name;
         this.sum = sum;
+    }
+
+    public Person(String name, String sum) {
+        this(name, new BigDecimal(sum));
     }
 
     public String getName() {
         return name;
     }
 
-    public double getSum() {
+    public BigDecimal getSum() {
         return sum;
     }
 
-    public void setSum(double sum) {
+    public void setSum(BigDecimal sum) {
         this.sum = sum;
     }
 
@@ -28,11 +34,7 @@ public class Person {
         return new Comparator<Person>() {
             @Override
             public int compare(Person p1, Person p2) {
-                if (p1.sum > p2.sum) {
-                    return 1;
-                } else {
-                    return -1;
-                }
+                return p1.sum.compareTo(p2.sum);
             }
         };
     }
@@ -41,11 +43,7 @@ public class Person {
         return new Comparator<Person>() {
             @Override
             public int compare(Person p1, Person p2) {
-                if (p1.sum < p2.sum) {
-                    return 1;
-                } else {
-                    return -1;
-                }
+                return p2.sum.compareTo(p1.sum);
             }
         };
     }

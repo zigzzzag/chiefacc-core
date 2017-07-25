@@ -1,15 +1,21 @@
 package org.chiefacc.core;
 
+import java.math.BigDecimal;
+
 public class PersonPair implements Comparable<PersonPair> {
 
     private final Person payFrom;
     private final Person payTo;
-    private final double sum;
+    private final BigDecimal sum;
 
-    public PersonPair(Person payFrom, Person payTo, double sum) {
+    public PersonPair(Person payFrom, Person payTo, BigDecimal sum) {
         this.payFrom = payFrom;
         this.payTo = payTo;
         this.sum = sum;
+    }
+
+    public PersonPair(Person payFrom, Person payTo, String sum) {
+        this(payFrom, payTo, new BigDecimal(sum));
     }
 
     public Person getPayFrom() {
@@ -20,7 +26,7 @@ public class PersonPair implements Comparable<PersonPair> {
         return payTo;
     }
 
-    private double getSum() {
+    private BigDecimal getSum() {
         return sum;
     }
 
@@ -30,12 +36,10 @@ public class PersonPair implements Comparable<PersonPair> {
 
     @Override
     public int compareTo(PersonPair pp) {
-        if (this.sum < pp.getSum()) {
-            return 1;
-        } else if (this.sum > pp.getSum()) {
-            return -1;
-        } else {
+        if (this.sum.equals(pp.getSum())) {
             return getBothNames().compareTo(pp.getBothNames());
+        } else {
+            return pp.getSum().compareTo(this.sum);
         }
     }
 
@@ -46,19 +50,16 @@ public class PersonPair implements Comparable<PersonPair> {
 
         PersonPair that = (PersonPair) o;
 
-        if (Double.compare(that.sum, sum) != 0) return false;
         if (payFrom != null ? !payFrom.equals(that.payFrom) : that.payFrom != null) return false;
-        return payTo != null ? payTo.equals(that.payTo) : that.payTo == null;
+        if (payTo != null ? !payTo.equals(that.payTo) : that.payTo != null) return false;
+        return sum != null ? sum.equals(that.sum) : that.sum == null;
     }
 
     @Override
     public int hashCode() {
-        int result;
-        long temp;
-        result = payFrom != null ? payFrom.hashCode() : 0;
+        int result = payFrom != null ? payFrom.hashCode() : 0;
         result = 31 * result + (payTo != null ? payTo.hashCode() : 0);
-        temp = Double.doubleToLongBits(sum);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (sum != null ? sum.hashCode() : 0);
         return result;
     }
 

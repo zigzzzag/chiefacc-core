@@ -1,5 +1,7 @@
 package org.chiefacc.core;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.NavigableSet;
 import java.util.PriorityQueue;
@@ -8,24 +10,35 @@ import java.util.TreeSet;
 
 public class SumDistributor {
 
+    private static final BigDecimal EPSILON = new BigDecimal(0.001);
+
     public SumDistributor() {
     }
 
     public Collection<PersonPair> distribute(Set<Person> persons) {
-        final PriorityQueue<Person> personsMaxToMin = new PriorityQueue<>(persons.size(), Person.maxToMinComparator());
-        personsMaxToMin.addAll(persons);
+        return distribute(persons, averageFromPersons(persons));
+    }
 
-        return distribute(personsMaxToMin, new TreeSet<PersonPair>(), averageFromPersons(persons));
+    public Collection<PersonPair> distribute(Set<Person> persons, BigDecimal averageFromPersons) {
+        final PriorityQueue<Person> personsMaxToMin = new PriorityQueue<>(persons.size(), Person.maxToMinComparator());
+
+        // create copy persons
+        for (Person p : persons) {
+            personsMaxToMin.add(new Person(p.getName(), p.getSum()));
+        }
+
+        return distribute(personsMaxToMin, new TreeSet<PersonPair>(), averageFromPersons);
     }
 
     private NavigableSet<PersonPair> distribute(PriorityQueue<Person> personsMaxToMin, NavigableSet<PersonPair> distrRes,
-                                                final double averageSum) {
+                                                final BigDecimal averageSum) {
 
-        if (personsMaxToMin == null || personsMaxToMin.isEmpty() || personsMaxToMin.peek().getSum() == averageSum) {
+        if (personsMaxToMin == null || personsMaxToMin.isEmpty()
+                || sumEqual(personsMaxToMin.peek().getSum(), averageSum)) {
             return new TreeSet<>();
         }
 
-        double sumToDistr = personsMaxToMin.peek().getSum() - averageSum;
+        BigDecimal sumToDistr = personsMaxToMin.peek().getSum().subtract(averageSum);
 
         // распределяем разницу первого по всем начиная с последнего
         final Person firstPerson = personsMaxToMin.poll();
@@ -35,16 +48,16 @@ public class SumDistributor {
         personsMinToMax.addAll(personsMaxToMin);
         while (!personsMinToMax.isEmpty()) {
             Person p = personsMinToMax.poll();
-            if (sumToDistr <= averageSum - p.getSum()) {
-                p.setSum(p.getSum() + sumToDistr);
+            if (sumToDistr.compareTo(averageSum.subtract(p.getSum())) <= 0) {
+                p.setSum(p.getSum().add(sumToDistr));
                 distrRes.add(new PersonPair(p, firstPerson, sumToDistr));
                 break;
             } else {
-                double diff = averageSum - p.getSum();
-                if (diff != 0) {
-                    p.setSum(p.getSum() + diff);
+                BigDecimal diff = averageSum.subtract(p.getSum());
+                if (diff.abs().compareTo(EPSILON) > 0) {
+                    p.setSum(p.getSum().add(diff));
                     distrRes.add(new PersonPair(p, firstPerson, diff));
-                    sumToDistr -= diff;
+                    sumToDistr = sumToDistr.subtract(diff);
                 }
             }
         }
@@ -54,12 +67,16 @@ public class SumDistributor {
         return distrRes;
     }
 
-    private double averageFromPersons(Collection<Person> persons) {
-        double allSum = 0;
+    private boolean sumEqual(BigDecimal sum1, BigDecimal sum2) {
+        return sum1.subtract(sum2).abs().compareTo(EPSILON) <= 0;
+    }
+
+    public BigDecimal averageFromPersons(Collection<Person> persons) {
+        BigDecimal allSum = new BigDecimal(0);
         for (Person p : persons) {
-            allSum += p.getSum();
+            allSum = allSum.add(p.getSum());
         }
 
-        return allSum / persons.size();
+        return new BigDecimal(allSum.doubleValue() / persons.size()).setScale(2, RoundingMode.HALF_EVEN);
     }
 }
