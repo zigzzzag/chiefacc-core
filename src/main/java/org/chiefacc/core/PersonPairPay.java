@@ -14,12 +14,12 @@ public class PersonPairPay implements Comparable<PersonPairPay> {
         this.sum = sum;
     }
 
-    public PersonPairPay(String payFromName, String payToName, String sum) {
-        this(payFromName, payToName, new BigDecimal(sum));
+    public PersonPairPay(String payFromName, String payToName, double sum) {
+        this(payFromName, payToName, BigDecimal.valueOf(sum));
     }
 
-    public PersonPairPay(Person payFrom, Person payTo, String sum) {
-        this(payFrom.getName(), payTo.getName(), new BigDecimal(sum));
+    public PersonPairPay(Person payFrom, Person payTo, double sum) {
+        this(payFrom.getName(), payTo.getName(), BigDecimal.valueOf(sum));
     }
 
     public String getPayFromName() {

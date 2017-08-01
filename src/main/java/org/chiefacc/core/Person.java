@@ -14,8 +14,8 @@ public class Person {
         this.sum = sum;
     }
 
-    public Person(String name, String sum) {
-        this(name, new BigDecimal(sum));
+    public Person(String name, double sum) {
+        this(name, BigDecimal.valueOf(sum));
     }
 
     public String getName() {

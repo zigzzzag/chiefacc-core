@@ -81,12 +81,12 @@ public class SumDistributor {
     }
 
     public BigDecimal averageFromPersons(Collection<Person> persons) {
-        BigDecimal allSum = new BigDecimal(0);
+        BigDecimal allSum = BigDecimal.ZERO;
         for (Person p : persons) {
             allSum = allSum.add(p.getSum());
         }
 
         return BigDecimal.valueOf(allSum.doubleValue()).divide(
-                BigDecimal.valueOf(persons.size()), 2, RoundingMode.HALF_EVEN);
+                BigDecimal.valueOf(persons.size()), RoundingMode.HALF_EVEN);
     }
 }
