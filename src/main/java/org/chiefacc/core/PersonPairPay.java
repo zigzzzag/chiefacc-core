@@ -40,7 +40,7 @@ public class PersonPairPay implements Comparable<PersonPairPay> {
 
     @Override
     public int compareTo(PersonPairPay pp) {
-        if (this.sum.equals(pp.getSum())) {
+        if (this.sum.compareTo(pp.getSum()) == 0) {
             return getBothNames().compareTo(pp.getBothNames());
         } else {
             return pp.getSum().compareTo(this.sum);

@@ -30,20 +30,32 @@ public class Person {
         this.sum = sum;
     }
 
-    static Comparator<Person> minToMaxComparator() {
+    @SuppressWarnings("Duplicates")
+    public static Comparator<Person> minToMaxComparator() {
         return new Comparator<Person>() {
             @Override
             public int compare(Person p1, Person p2) {
-                return p1.sum.compareTo(p2.sum);
+                int comp = p1.sum.compareTo(p2.sum);
+                if (comp == 0) {
+                    return p1.name.compareTo(p2.name);
+                } else {
+                    return comp;
+                }
             }
         };
     }
 
-    static Comparator<Person> maxToMinComparator() {
+    @SuppressWarnings("Duplicates")
+    public static Comparator<Person> maxToMinComparator() {
         return new Comparator<Person>() {
             @Override
             public int compare(Person p1, Person p2) {
-                return p2.sum.compareTo(p1.sum);
+                int comp = p2.sum.compareTo(p1.sum);
+                if (comp == 0) {
+                    return p1.name.compareTo(p2.name);
+                } else {
+                    return comp;
+                }
             }
         };
     }
@@ -61,5 +73,13 @@ public class Person {
     @Override
     public int hashCode() {
         return name != null ? name.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "name='" + name + '\'' +
+                ", sum=" + sum +
+                '}';
     }
 }

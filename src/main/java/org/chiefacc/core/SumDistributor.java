@@ -87,6 +87,6 @@ public class SumDistributor {
         }
 
         return BigDecimal.valueOf(allSum.doubleValue()).divide(
-                BigDecimal.valueOf(persons.size()), RoundingMode.HALF_EVEN);
+                BigDecimal.valueOf(persons.size()), 2, RoundingMode.HALF_EVEN);
     }
 }

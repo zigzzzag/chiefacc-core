@@ -76,13 +76,12 @@ public class SumDistributorTest {
         expected.add(new PersonPairPay(p3, p1, 1));
         expected.add(new PersonPairPay(p4, p1, 1));
         expected.add(new PersonPairPay(p6, p1, 1));
-        expected.add(new PersonPairPay(p5, p1, 2));
-
-        System.out.println(expected.equals(distributed));
+        expected.add(new PersonPairPay(p5, p1, 1));
 
         assertEquals(expected, distributed);
 
-        assertEquals(BigDecimal.valueOf(1), sd.averageFromPersons(personsTest));
+        assertEquals(0, BigDecimal.valueOf(1).compareTo(
+                sd.averageFromPersons(personsTest)));
     }
 
     @Test
@@ -118,7 +117,8 @@ public class SumDistributorTest {
 
         assertEquals(expected, distributed);
 
-        assertEquals(BigDecimal.valueOf(100.1), sd.averageFromPersons(personsTest));
+        assertEquals(0, BigDecimal.valueOf(100.1).compareTo(
+                sd.averageFromPersons(personsTest)));
     }
 
     @Test
@@ -153,7 +153,8 @@ public class SumDistributorTest {
 
         assertEquals(expected, distributed);
 
-        assertEquals(BigDecimal.valueOf(2), sd.averageFromPersons(personsTest));
+        assertEquals(0, BigDecimal.valueOf(2).compareTo(
+                sd.averageFromPersons(personsTest)));
     }
 
     @Test
@@ -187,7 +188,7 @@ public class SumDistributorTest {
 
         assertEquals(expected, distributed);
 
-        assertEquals(BigDecimal.valueOf(350.00), sd.averageFromPersons(personsTest));
+        assertEquals(0, BigDecimal.valueOf(350).compareTo(sd.averageFromPersons(personsTest)));
     }
 
     @Test
@@ -223,8 +224,7 @@ public class SumDistributorTest {
 
         assertEquals(expected, distributed);
 
-
-        assertEquals(BigDecimal.valueOf(250.05), sd.averageFromPersons(personsTest));
+        assertEquals(0, BigDecimal.valueOf(250.05).compareTo(sd.averageFromPersons(personsTest)));
     }
 
     @Test
