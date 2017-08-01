@@ -236,4 +236,41 @@ public class SumDistributorTest {
         assertEquals(new BigDecimal("550.05"), sd.averageFromPersons(personsTest));
     }
 
+    @Test
+    public void allSumTest4() {
+        Person p1 = new Person("p1", "200");
+        Person p2 = new Person("p2", "1000");
+        Person p3 = new Person("p3", "850");
+        Person p4 = new Person("p4", "750");
+        Person p5 = new Person("p5", "500.3333");
+        Person p6 = new Person("p6", "0");
+
+        SumDistributor sd = new SumDistributor();
+
+        Set<Person> personsTest = new HashSet<>();
+        personsTest.add(p1);
+        personsTest.add(p2);
+        personsTest.add(p3);
+        personsTest.add(p4);
+        personsTest.add(p5);
+        personsTest.add(p6);
+
+        Collection<PersonPair> distributed = sd.distribute(personsTest);
+        for (PersonPair pp : distributed) {
+            LOG.info(pp.toString());
+        }
+
+        NavigableSet<PersonPair> expected = new TreeSet<>();
+        expected.add(new PersonPair(p6, p2, "449.94"));
+        expected.add(new PersonPair(p1, p3, "299.94"));
+        expected.add(new PersonPair(p6, p4, "100.12"));
+        expected.add(new PersonPair(p1, p4, "50.12"));
+        expected.add(new PersonPair(p5, p4, "49.70"));
+
+        assertEquals(expected, distributed);
+
+
+        assertEquals(new BigDecimal("550.06"), sd.averageFromPersons(personsTest));
+    }
+
 }
