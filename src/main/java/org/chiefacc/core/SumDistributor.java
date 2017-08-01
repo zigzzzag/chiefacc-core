@@ -15,11 +15,11 @@ public class SumDistributor {
     public SumDistributor() {
     }
 
-    public Collection<PersonPair> distribute(Set<Person> persons) {
+    public Collection<PersonPairPay> distribute(Set<Person> persons) {
         return distribute(persons, averageFromPersons(persons));
     }
 
-    private Collection<PersonPair> distribute(Set<Person> persons, BigDecimal averageFromPersons) {
+    private Collection<PersonPairPay> distribute(Set<Person> persons, BigDecimal averageFromPersons) {
         final PriorityQueue<Person> personsMaxToMin = new PriorityQueue<>(persons.size(), Person.maxToMinComparator());
 
         // create copy persons
@@ -27,11 +27,11 @@ public class SumDistributor {
             personsMaxToMin.add(new Person(p.getName(), p.getSum().setScale(2, RoundingMode.HALF_EVEN)));
         }
 
-        return distribute(personsMaxToMin, new TreeSet<PersonPair>(), averageFromPersons);
+        return distribute(personsMaxToMin, new TreeSet<PersonPairPay>(), averageFromPersons);
     }
 
-    private NavigableSet<PersonPair> distribute(PriorityQueue<Person> personsMaxToMin, NavigableSet<PersonPair> distrRes,
-                                                final BigDecimal averageSum) {
+    private NavigableSet<PersonPairPay> distribute(PriorityQueue<Person> personsMaxToMin, NavigableSet<PersonPairPay> distRes,
+                                                   final BigDecimal averageSum) {
 
         if (personsMaxToMin == null || personsMaxToMin.size() <= 1
                 || sumEqual(personsMaxToMin.peek().getSum(), averageSum)) {
@@ -47,7 +47,7 @@ public class SumDistributor {
             Person p = personsMinToMax.poll();
             if (sumToDist.compareTo(averageSum.subtract(p.getSum())) <= 0) {
                 p.setSum(p.getSum().add(sumToDist));
-                distrRes.add(new PersonPair(p, firstPerson, sumToDist));
+                distRes.add(new PersonPairPay(p.getName(), firstPerson.getName(), sumToDist));
 
                 // for reorder
                 if (personsMaxToMin.remove(p)) {
@@ -59,15 +59,21 @@ public class SumDistributor {
                 final BigDecimal diff = averageSum.subtract(p.getSum());
                 if (diff.abs().compareTo(EPSILON) > 0) {
                     p.setSum(p.getSum().add(diff));
-                    distrRes.add(new PersonPair(p, firstPerson, diff));
+
+                    // for reorder
+                    if (personsMaxToMin.remove(p)) {
+                        personsMaxToMin.add(p);
+                    }
+
+                    distRes.add(new PersonPairPay(p.getName(), firstPerson.getName(), diff));
                     sumToDist = sumToDist.subtract(diff);
                 }
             }
         }
 
-        distribute(personsMaxToMin, distrRes, averageSum);
+        distribute(personsMaxToMin, distRes, averageSum);
 
-        return distrRes;
+        return distRes;
     }
 
     private boolean sumEqual(BigDecimal sum1, BigDecimal sum2) {
